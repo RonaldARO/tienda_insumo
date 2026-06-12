@@ -1,3 +1,8 @@
+<?php
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+?>
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -564,11 +569,21 @@
                         <a class="nav-link nav-link-custom" href="#tecnologia">Tecnología</a>
                     </li>
                 </ul>
-                <div class="d-flex">
-                    <button class="btn btn-agro-primary" data-bs-toggle="modal" data-bs-target="#loginModal">
-                        <i class="bi bi-lock-fill me-2"></i> Acceso Personal
-                    </button>
+                <div class="d-flex align-items-center gap-3">
+                    <?php if (isset($_SESSION['user_id'])): ?>
+                        <span class="text-success-emphasis fw-semibold small">
+                            <i class="bi bi-person-circle me-1"></i> Hola, <?php echo htmlspecialchars($_SESSION['username']); ?> (<?php echo htmlspecialchars($_SESSION['role_name']); ?>)
+                        </span>
+                        <a href="../login.php" class="btn btn-agro-secondary btn-sm py-2 px-3">
+                            <i class="bi bi-box-arrow-right me-1"></i> Salir
+                        </a>
+                    <?php else: ?>
+                        <a href="../login.php" class="btn btn-agro-primary">
+                            <i class="bi bi-lock-fill me-2"></i> Acceso Personal
+                        </a>
+                    <?php endif; ?>
                 </div>
+
             </div>
         </div>
     </nav>
@@ -588,9 +603,9 @@
                         Una solución profesional diseñada para optimizar inventarios, gestionar lotes, controlar mermas y garantizar la viabilidad financiera de tu agrocomercio en tiempo real.
                     </p>
                     <div class="d-flex flex-wrap gap-3">
-                        <button class="btn btn-agro-primary btn-lg" data-bs-toggle="modal" data-bs-target="#loginModal">
+                        <a href="../views/auth/login.php" class="btn btn-agro-primary btn-lg">
                             <i class="bi bi-box-arrow-in-right me-2"></i> Entrar al Panel
-                        </button>
+                        </a>
                         <a href="#simulador" class="btn btn-agro-secondary btn-lg">
                             <i class="bi bi-calculator me-2"></i> Simular Margen
                         </a>
@@ -972,90 +987,6 @@
         </div>
     </footer>
 
-    <!-- LOGIN MODAL -->
-    <div class="modal fade" id="loginModal" tabindex="-1" aria-labelledby="loginModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
-                <!-- Modal Head Banner -->
-                <div class="bg-success text-white p-4 text-center position-relative" style="background: linear-gradient(135deg, var(--primary-forest) 0%, var(--primary-emerald) 100%) !important;">
-                    <button type="button" class="btn-close btn-close-white position-absolute top-0 end-0 m-3" data-bs-dismiss="modal" aria-label="Close"></button>
-                    <i class="bi bi-shield-lock-fill display-5 mb-2"></i>
-                    <h4 class="modal-title font-title" id="loginModalLabel">Acceso al Sistema</h4>
-                    <p class="small mb-0 opacity-75">Control de Inventario y Ventas</p>
-                </div>
-                
-                <div class="modal-body p-4">
-                    <!-- Demo Account Info Alerts -->
-                    <div class="alert alert-info py-2 px-3 mb-4 rounded border-0 fs-8">
-                        <i class="bi bi-info-circle-fill me-2"></i><strong>Credenciales demo:</strong><br>
-                        • <strong>Administrador:</strong> admin@agrostock.com / admin123<br>
-                        • <strong>Vendedor:</strong> vendedor@agrostock.com / vend123
-                    </div>
-
-                    <!-- Interactive Role selection -->
-                    <label class="form-label fw-semibold text-secondary small mb-2 d-block">Selecciona tu Rol de Acceso</label>
-                    <div class="role-selector-container">
-                        <div class="role-option active" onclick="selectRole('Administrador', this)">
-                            <i class="bi bi-person-badge-fill"></i>
-                            <span class="small">Admin</span>
-                        </div>
-                        <div class="role-option" onclick="selectRole('Vendedor', this)">
-                            <i class="bi bi-person-workspace"></i>
-                            <span class="small">Vendedor</span>
-                        </div>
-                        <div class="role-option" onclick="selectRole('Cliente', this)">
-                            <i class="bi bi-people-fill"></i>
-                            <span class="small">Cliente</span>
-                        </div>
-                    </div>
-
-                    <form id="loginForm" onsubmit="handleLogin(event)">
-                        <!-- Hidden input to store role selection -->
-                        <input type="hidden" id="selectedRole" value="Administrador">
-
-                        <!-- Email input -->
-                        <div class="mb-3">
-                            <label for="loginEmail" class="form-label fw-semibold text-secondary small">Correo Electrónico</label>
-                            <div class="input-group">
-                                <span class="input-group-text bg-light border-end-0"><i class="bi bi-envelope text-muted"></i></span>
-                                <input type="email" class="form-control border-start-0" id="loginEmail" placeholder="nombre@agrostock.com" required>
-                            </div>
-                        </div>
-
-                        <!-- Password input with visibility toggle -->
-                        <div class="mb-4">
-                            <div class="d-flex justify-content-between">
-                                <label for="loginPassword" class="form-label fw-semibold text-secondary small">Contraseña</label>
-                                <a href="#" class="fs-8 text-success text-decoration-none">¿La olvidaste?</a>
-                            </div>
-                            <div class="input-group">
-                                <span class="input-group-text bg-light border-end-0"><i class="bi bi-key text-muted"></i></span>
-                                <input type="password" class="form-control border-start-0 border-end-0" id="loginPassword" placeholder="••••••••" required>
-                                <button type="button" class="btn btn-outline-secondary border-start-0 bg-light" id="togglePasswordBtn" onclick="togglePasswordVisibility()">
-                                    <i class="bi bi-eye text-muted" id="togglePasswordIcon"></i>
-                                </button>
-                            </div>
-                        </div>
-
-                        <!-- Submit Button -->
-                        <button type="submit" class="btn btn-agro-primary w-100 py-2.5 rounded-3 mb-2" id="loginSubmitBtn">
-                            <i class="bi bi-box-arrow-in-right me-2"></i> Iniciar Sesión
-                        </button>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- TOAST NOTIFICATION -->
-    <div id="loginSuccessToast" class="custom-toast">
-        <i class="bi bi-check-circle-fill"></i>
-        <div>
-            <strong class="d-block text-dark small" id="toastTitle">Acceso Autorizado</strong>
-            <span class="text-secondary small" id="toastMessage">Bienvenido a la plataforma AgroStock.</span>
-        </div>
-    </div>
-
     <!-- Bootstrap Bundle with Popper JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
@@ -1071,49 +1002,8 @@
             }
         });
 
-        // Toggle password visibility
-        function togglePasswordVisibility() {
-            const passwordInput = document.getElementById('loginPassword');
-            const toggleIcon = document.getElementById('togglePasswordIcon');
-            
-            if (passwordInput.type === 'password') {
-                passwordInput.type = 'text';
-                toggleIcon.classList.remove('bi-eye');
-                toggleIcon.classList.add('bi-eye-slash');
-            } else {
-                passwordInput.type = 'password';
-                toggleIcon.classList.remove('bi-eye-slash');
-                toggleIcon.classList.add('bi-eye');
-            }
-        }
-
-        // Role select logic
-        function selectRole(roleName, element) {
-            // Update hidden role input
-            document.getElementById('selectedRole').value = roleName;
-            
-            // Remove active class from all options
-            const options = document.querySelectorAll('.role-option');
-            options.forEach(opt => opt.classList.remove('active'));
-            
-            // Add active class to clicked option
-            element.classList.add('active');
-
-            // Pre-fill demo emails based on selected role to facilitate user testing
-            const emailInput = document.getElementById('loginEmail');
-            if (roleName === 'Administrador') {
-                emailInput.value = 'admin@agrostock.com';
-            } else if (roleName === 'Vendedor') {
-                emailInput.value = 'vendedor@agrostock.com';
-            } else {
-                emailInput.value = '';
-            }
-        }
-
-        // Auto-fill initial role demo email
+        // Initialize Simulator inputs
         document.addEventListener('DOMContentLoaded', () => {
-            document.getElementById('loginEmail').value = 'admin@agrostock.com';
-            
             // Attach event listeners to simulator inputs
             document.getElementById('simCompra').addEventListener('input', calculateSimulator);
             document.getElementById('simVenta').addEventListener('input', calculateSimulator);
@@ -1160,42 +1050,6 @@
                 profitText.innerText = `$${profit.toFixed(2)}`;
                 marginText.innerText = `${margin.toFixed(2)}%`;
             }
-        }
-
-        // Mock login form submit action
-        function handleLogin(event) {
-            event.preventDefault();
-            
-            const role = document.getElementById('selectedRole').value;
-            const email = document.getElementById('loginEmail').value;
-            const submitBtn = document.getElementById('loginSubmitBtn');
-            
-            // Disable button and show spinner
-            submitBtn.disabled = true;
-            submitBtn.innerHTML = `<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Validando...`;
-            
-            setTimeout(() => {
-                // Restore button
-                submitBtn.disabled = false;
-                submitBtn.innerHTML = `<i class="bi bi-box-arrow-in-right me-2"></i> Iniciar Sesión`;
-                
-                // Hide modal
-                const loginModal = bootstrap.Modal.getInstance(document.getElementById('loginModal'));
-                loginModal.hide();
-                
-                // Trigger customized Success Toast
-                document.getElementById('toastTitle').innerText = `Sesión Iniciada`;
-                document.getElementById('toastMessage').innerText = `Has ingresado con éxito al panel de ${role}.`;
-                
-                const toast = document.getElementById('loginSuccessToast');
-                toast.classList.add('show');
-                
-                // Hide toast after 4 seconds
-                setTimeout(() => {
-                    toast.classList.remove('show');
-                }, 4000);
-                
-            }, 1500);
         }
     </script>
 </body>
